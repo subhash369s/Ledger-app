@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,10 +20,15 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: LedgerViewModel by viewModels()
 
+    // Hoisted outside setContent so onResume can update it without recreating the Activity.
+    private val accessEnabledState = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        accessEnabledState.value = isNotificationAccessEnabled()
+
         setContent {
-            var accessEnabled by remember { mutableStateOf(isNotificationAccessEnabled()) }
+            val accessEnabled by accessEnabledState
 
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -42,8 +46,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Re-check every time the user comes back (e.g. after granting access in Settings).
-        recreate()
+        // Re-check every time the user comes back (e.g. after granting access in Settings),
+        // but just update the state -- never recreate the Activity here, since recreating
+        // triggers onResume again and would loop forever.
+        accessEnabledState.value = isNotificationAccessEnabled()
     }
 
     private fun isNotificationAccessEnabled(): Boolean {
