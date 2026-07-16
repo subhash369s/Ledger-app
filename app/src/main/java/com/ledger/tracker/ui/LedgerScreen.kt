@@ -35,8 +35,7 @@ fun LedgerScreen(
     }) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
+                .padding(pad                .fillMaxSize()
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -176,7 +175,7 @@ private fun SummaryCard(label: String, value: Double, modifier: Modifier = Modif
         }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DraftCard(
     draft: TransactionEntity,
